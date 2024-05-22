@@ -1,0 +1,5 @@
+SELECT * FROM member;
+
+CREATE DATABASE
+CREATE TABLE member;
+
