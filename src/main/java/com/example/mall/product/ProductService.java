@@ -1,9 +1,11 @@
 package com.example.mall.product;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Service
@@ -11,32 +13,30 @@ import java.util.List;
 public class ProductService {
     ProductRepository productRepository;
 
-//    ProductService(ProductRepository productRepository) {
-//        this.productRepository = productRepository;
-//    }
-
     public Product registerProduct(Product product) {
         System.out.println("/products : service - " + product.getName());
         return productRepository.save(product);
     }
 
     public Product findProduct(int id) {
-        return productRepository.findProduct(id);
+        return productRepository.findById(id);
     }
 
-    public List<Product> findProducts(int limit, int currentPage, Integer categoryId){
-        return productRepository.findProducts(limit, currentPage,categoryId);
+    public Page<Product> findProducts(int limit, int currentPage, Integer categoryId){
+        Pageable pageable = PageRequest.of(currentPage, limit);
+        return productRepository.findAllByCategoryId(categoryId,pageable);
     }
 
-    public List<Product> findProducts(int limit, int currentPage){
-        return productRepository.findProducts(limit, currentPage);
+    public Page<Product> findProducts(int limit, int currentPage){
+        PageRequest pageable = PageRequest.of(currentPage, limit);
+        return productRepository.findAll(pageable);
     }
 
     public void deleteProduct(int id) {
-        productRepository.deleteProduct(id);
+        productRepository.deleteById(id);
     }
 
     public void deleteProducts(List<Integer> productIds) {
-        productRepository.deleteProducts(productIds);
+        productRepository.deleteByIdIn(productIds);
     }
 }

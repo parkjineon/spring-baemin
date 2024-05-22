@@ -1,16 +1,24 @@
 package com.example.mall.product;
 
+import com.example.mall.utils.ApiUtils;
 import com.example.mall.utils.Validator;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Map;
+
+import static com.example.mall.utils.ApiUtils.error;
+import static com.example.mall.utils.ApiUtils.success;
 
 
 @Slf4j
@@ -23,20 +31,24 @@ public class ProductController {
 
     // 상품 개별 등록
     @PostMapping("/products")
-    public ResponseEntity registerProduct(@RequestBody Product product) {
+    public ApiUtils.ApiResult<String> registerProduct(@Valid @RequestBody ProductDTO productDTO) {
 
-        if (Validator.isAlpha(product.getName()) && Validator.isNumber(product.getPrice())) {
-            log.info(product.getName());
-            Product savedProduct = productService.registerProduct(product);
+        if (Validator.isAlpha(productDTO.getName()) && Validator.isNumber(productDTO.getPrice())) {
+            log.info(productDTO.getName());
+
+            Product requestProduct = productDTO.convertToEntity();
+
+            Product savedProduct = productService.registerProduct(requestProduct);
+
             try {
                 log.info(savedProduct.getName());
             } catch (NullPointerException e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return error("서버 내부 에러",HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return success(savedProduct.getName());
         } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return error("잘못된 요청",HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -44,7 +56,7 @@ public class ProductController {
     @GetMapping("products")
     public ResponseEntity<List<Product>> findProducts(
             @RequestParam(value="limit", defaultValue = "5") int limit,
-            @RequestParam(value="currentPage", defaultValue = "1") int currentPage,
+            @RequestParam(value="currentPage", defaultValue = "0") int currentPage,
             @RequestParam(value="categoryId", required = false) Integer categoryId){
 
         log.info("limit={}",limit);
@@ -52,11 +64,11 @@ public class ProductController {
         log.info("categoryId = {}", categoryId);
 
         if(categoryId ==  null){
-            List<Product> resultProducts = productService.findProducts(limit, currentPage);
-            return new ResponseEntity<>(resultProducts,HttpStatus.OK);
+            Page<Product> resultProducts = productService.findProducts(limit, currentPage);
+            return new ResponseEntity<>(resultProducts.getContent(),HttpStatus.OK);
         }else{
-            List<Product> resultProducts = productService.findProducts(limit, currentPage, categoryId);
-            return new ResponseEntity<>(resultProducts,HttpStatus.OK);
+            Page<Product> resultProducts = productService.findProducts(limit, currentPage, categoryId);
+            return new ResponseEntity<>(resultProducts.getContent(),HttpStatus.OK);
         }
 
     }

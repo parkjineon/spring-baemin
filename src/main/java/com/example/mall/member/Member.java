@@ -21,9 +21,7 @@ public class Member {
     private String contact;
 
     @Autowired
-    public Member(){
-
-    }
+    public Member(){}
 
     public Member(String userId, String pw){
         this.userId = userId;
@@ -38,7 +36,7 @@ public class Member {
         this.contact = contact;
     }
 
-    public Member fromDTOToEntity(MemberDTO memberDTO){
+    public Member convertToDTO(MemberDTO memberDTO){
         return new Member(
                 memberDTO.getUserId(),
                 memberDTO.getPw(),

@@ -1,5 +1,9 @@
-SELECT * FROM member;
-
-CREATE DATABASE
-CREATE TABLE member;
+CREATE TABLE Product
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    categoryId INT NOT NULL,
+    price INT NOT NULL,
+    name VARCHAR(30) NOT NULL,
+    description VARCHAR(50) NOT NULL
+);
 

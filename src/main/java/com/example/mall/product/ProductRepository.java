@@ -1,65 +1,29 @@
 package com.example.mall.product;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Repository
-public class ProductRepository {
-    Map<Integer, Product> productTable = new HashMap<>();
+public interface ProductRepository extends JpaRepository<Product,Integer> {
 
-    int id = 0;
+    public Product findById(int id);
 
-    public Product save(Product product) {
+    public Page<Product> findAllByCategoryId(Integer categoryId,Pageable pageable);
 
-        product.setId(id++);
-        productTable.put(product.getId(), product);
-        System.out.println("/products : repository - " + productTable.get(id-1));
+    public Page<Product> findAll(Pageable pageable);
 
-        return productTable.get(id-1);
-    }
+    public void deleteById(int id);
 
-    public Product findProduct(int id) {
-        return productTable.get(id);
-    }
-
-    public List<Product> findProducts(int limit, int currentPage, Integer categoryId){
-        List<Product> resultProducts = new ArrayList<>();
-
-        int count = 0;
-        for(int i = (currentPage-1)*limit; i < id; i++){
-            if(productTable.get(i) != null && productTable.get(i).getCategoryId() == categoryId){
-                resultProducts.add(productTable.get(i));
-                count++;
-            }
-            if(count == limit) break;
-        }
-
-        return resultProducts;
-    }
-
-    public List<Product> findProducts(int limit, int currentPage){
-        List<Product> resultProducts = new ArrayList<>();
-
-        int count = 0;
-        for (int i = (currentPage - 1) * limit; i < id; i++) {
-            if (productTable.get(i) != null) {
-                resultProducts.add(productTable.get(i));
-                count++;
-            }
-            if(count == limit) break;
-        }
-
-        return resultProducts;
-    }
-
-    public void deleteProduct(int id) {
-        productTable.remove(id);
-    }
-
-    public void deleteProducts(List<Integer> productIds) {
-        for(int i = 0; i < productIds.size(); i++){
-            productTable.remove(productIds.get(i));
-        }
-    }
+    @Transactional
+    @Modifying
+    public void deleteByIdIn(List<Integer> ids);
 }
