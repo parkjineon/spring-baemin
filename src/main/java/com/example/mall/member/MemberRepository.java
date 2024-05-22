@@ -2,6 +2,7 @@ package com.example.mall.member;
 
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,17 +13,16 @@ import java.util.Map;
 import java.util.Objects;
 
 @Repository
-public class MemberRepository {
-    private Map<String, Member> memberTable
-            = new HashMap<>();
+public class MemberRepository{
+
 
     @PersistenceContext
     EntityManager em;
 
     @PersistenceUnit
     EntityManagerFactory emf;
-    
-    
+
+
     @Autowired
     DataSource dataSource;
 
@@ -50,13 +50,17 @@ public class MemberRepository {
         }
     }
 
-    public boolean login(Member requestMember) {
-        Member member = findByUserId(requestMember.getUserId());
+    public Member login(String userId, String pw) {
+        Member member = findByUserId(userId);
 
-        return member != null && Objects.equals(member.getPw(), requestMember.getPw());
+        if(member != null && Objects.equals(member.getPw(), pw)){
+            return member;
+        }
+        return null;
     }
 
-    public Member findById(int id){
+
+    public  Member findById(int id){
         return em.find(Member.class, id);
     }
 }

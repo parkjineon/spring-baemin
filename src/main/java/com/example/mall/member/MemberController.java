@@ -1,9 +1,6 @@
 package com.example.mall.member;
 
-import ch.qos.logback.core.joran.sanity.Pair;
 import com.example.mall.utils.ApiUtils;
-
-import com.example.mall.utils.HandleException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,24 +17,13 @@ public class MemberController {
 
     MemberService memberService;
 
-//    @PostMapping("/join/res/en") // Before
-//    public ResponseEntity<String> joinByResponseEntity(@RequestBody MemberDTO memberDTO) {
-//        log.info(memberDTO.toString());
-//
-//        if(isDuplicateId(memberDTO))
-//            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
-//        Member requestMember = memberDTO.convertToEntity();
-//        String userId = memberService.join(requestMember);
-//        return new ResponseEntity<>(userId, HttpStatus.OK);
-//    }
-
     @PostMapping("/login")
     public ApiUtils.ApiResult<String> login(@RequestBody LoginDTO loginDTO){
         Member requestMember = loginDTO.convertToEntity();
 
-        boolean isSuccess = memberService.login(requestMember);
+        Member responseMember = memberService.login(requestMember);
 
-        if(!isSuccess){
+        if(responseMember == null){
             return error("로그인 실패", HttpStatus.BAD_REQUEST);
         }
 
@@ -59,11 +45,6 @@ public class MemberController {
 
     private boolean isDuplicateId(MemberDTO memberDTO) {
         return memberService.checkDuplicateId(memberDTO.getUserId());
-    }
-
-    @GetMapping("/datasource")
-    public void makeConnection(){
-        memberService.makeConnection();
     }
 
 

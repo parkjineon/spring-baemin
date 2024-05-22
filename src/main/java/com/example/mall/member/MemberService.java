@@ -4,17 +4,21 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 public class MemberService {
 
     MemberRepository memberRepository;
+    MemberJPARepository memberJPARepository;
 
     @Transactional
     public String join(Member member) {
         memberRepository.save(member);
+        Optional<Member> responseMember = memberJPARepository.findByUserId(member.getUserId());
+        return responseMember.map(Member::getUserId).orElse(null);
 
-        return memberRepository.findByUserId(member.getUserId()).getUserId();
     }
 
     public boolean checkDuplicateId(String userId) {
@@ -27,11 +31,7 @@ public class MemberService {
             return true;
     }
 
-    public void makeConnection() {
-        memberRepository.makeConnection();
-    }
-
-    public boolean login(Member requestMember) {
-        return memberRepository.login(requestMember);
+    public Member login(Member requestMember) {
+        return memberRepository.login(requestMember.getUserId(),requestMember.getPw());
     }
 }
