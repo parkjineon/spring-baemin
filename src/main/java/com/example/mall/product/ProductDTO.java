@@ -14,11 +14,11 @@ public class ProductDTO {
     private String name;
 
     @NotNull(message = "상품 가격은 필수 입력입니다.")
-    private int price;
+    private Integer price;
 
     @NotNull(message = "카테고리 ID는 필수 입력입니다.")
     @JsonProperty("category_id")
-    private int categoryId;
+    private Integer categoryId;
 
     @NotBlank(message = "상품설명은 필수 입력입니다.")
     private String description;
