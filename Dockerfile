@@ -7,3 +7,5 @@
 #
 ## JAR 파일 실행
 #CMD ["java", "-jar", "mall.jar"]
+
+##git login test
