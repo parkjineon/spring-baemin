@@ -54,7 +54,7 @@ public class ProductController {
 
     // 상품 전체, 카테고리별 조회
     @GetMapping("products")
-    public ResponseEntity<List<Product>> findProducts(
+    public ApiUtils.ApiResult<List<Product>> findProducts(
             @RequestParam(value="limit", defaultValue = "5") int limit,
             @RequestParam(value="currentPage", defaultValue = "0") int currentPage,
             @RequestParam(value="categoryId", required = false) Integer categoryId){
@@ -65,55 +65,54 @@ public class ProductController {
 
         if(categoryId ==  null){
             Page<Product> resultProducts = productService.findProducts(limit, currentPage);
-            return new ResponseEntity<>(resultProducts.getContent(),HttpStatus.OK);
+            return success(resultProducts.getContent());
         }else{
             Page<Product> resultProducts = productService.findProducts(limit, currentPage, categoryId);
-            return new ResponseEntity<>(resultProducts.getContent(),HttpStatus.OK);
+            return success(resultProducts.getContent());
         }
 
     }
 
     // 상품 개별 조회
     @GetMapping("/products/{id}")
-    public ResponseEntity<Product> findProduct(@PathVariable(value="id") int id) {
+    public ApiUtils.ApiResult findProduct(@PathVariable(value="id") int id) {
 
         if (!Validator.isNumber(id)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return error("잘못된 요청",HttpStatus.BAD_REQUEST);
         }
 
         Product resultProduct = productService.findProduct(id);
 
         if (resultProduct == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return error("존재하지 않는 상품",HttpStatus.NOT_FOUND);
 
-        return new ResponseEntity<>(resultProduct, HttpStatus.OK);
+        return success(resultProduct);
     }
 
     @DeleteMapping("/products/{id}")
-    public ResponseEntity deleteProduct(@PathVariable(value="id") int id) {
+    public ApiUtils.ApiResult<String> deleteProduct(@PathVariable(value="id") int id) {
         if(!Validator.isNumber(id)){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return error("잘못된 요청",HttpStatus.BAD_REQUEST);
         }
         productService.deleteProduct(id);
         Product product = productService.findProduct(id);
 
         if(product == null)
-            return new ResponseEntity<>(product,HttpStatus.OK);
+            return success("삭제 완료");
         else
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return error("서버 내부 에러",HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping("/products/delete")
-    public ResponseEntity deleteProducts(@RequestBody Map<String, List<Integer>> deleteRequest){
+    public ApiUtils.ApiResult<String> deleteProducts(@RequestBody Map<String, List<Integer>> deleteRequest){
         List<Integer> productIds = deleteRequest.get("productIds");
 
         if(productIds.isEmpty()){
-            log.info("productId 없습니다.");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return error("잘못된 요청",HttpStatus.BAD_REQUEST);
         }
 
         productService.deleteProducts(productIds);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return success("삭제 완료");
     }
 }
