@@ -1,25 +1,15 @@
 package com.example.mall.order;
 
-import lombok.extern.slf4j.Slf4j;
+import com.example.mall.member.Member;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-@Slf4j
+
 @Repository
-public class OrderRepository {
-    private final Map<Integer,Order> orderTable = new HashMap<>();
-    private int id = 0;
+public interface OrderRepository extends JpaRepository<Order,Integer> {
 
-    public Order save(Order order){
-
-        log.info("productName = {}", order.getProduct().getName());
-        log.info("count = {}", order.getCount());
-
-        order.setId(id);
-        orderTable.put(id++,order);
-
-        return order;
-    }
+    List<Order> findAllByMember(Member member);
 }

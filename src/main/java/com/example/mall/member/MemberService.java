@@ -10,28 +10,30 @@ import java.util.Optional;
 @AllArgsConstructor
 public class MemberService {
 
-    MemberRepository memberRepository;
     MemberJPARepository memberJPARepository;
 
     @Transactional
-    public String join(Member member) {
-        memberRepository.save(member);
-        Optional<Member> responseMember = memberJPARepository.findByUserId(member.getUserId());
-        return responseMember.map(Member::getUserId).orElse(null);
-
+    public Optional<Member> join(Member member) {
+        memberJPARepository.save(member);
+        return memberJPARepository.findByUserId(member.getUserId());
     }
 
     public boolean checkDuplicateId(String userId) {
-        Member existMember
-            = memberRepository.findByUserId(userId);
+        Optional<Member> existMember
+            = memberJPARepository.findByUserId(userId);
 
-        if (existMember == null)
+        if(existMember.isEmpty()){
             return false;
-        else
-            return true;
+        }
+
+        return true;
     }
 
     public Member login(Member requestMember) {
-        return memberRepository.login(requestMember.getUserId(),requestMember.getPw());
+        return memberJPARepository.login(requestMember.getUserId(),requestMember.getPw());
+    }
+
+    public Optional<Member> findById(int id){
+        return memberJPARepository.findById(id);
     }
 }

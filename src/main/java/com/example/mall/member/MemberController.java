@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 import static com.example.mall.utils.ApiUtils.error;
 import static com.example.mall.utils.ApiUtils.success;
 
@@ -39,8 +41,13 @@ public class MemberController {
             return error("아이디 중복",HttpStatus.CONFLICT); // 409 에러
         }
         Member requestMember = memberDto.convertToEntity();
-        String userId = memberService.join(requestMember);
-        return success(userId);
+        Optional<Member> responseMember = memberService.join(requestMember);
+
+        if(responseMember.isEmpty()){
+            return error("회원가입 실패", HttpStatus.BAD_REQUEST);
+        }
+
+        return success(responseMember.get().getId());
     }
 
     private boolean isDuplicateId(MemberDTO memberDTO) {

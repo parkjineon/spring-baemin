@@ -20,7 +20,7 @@ public class ProductDTO {
     @JsonProperty("category_id")
     private Integer categoryId;
 
-    @NotBlank(message = "상품설명은 필수 입력입니다.")
+    @NotBlank(message = "상품 설명은 필수 입력입니다.")
     private String description;
 
     public Product convertToEntity(){

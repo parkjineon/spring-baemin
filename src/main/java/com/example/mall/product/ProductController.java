@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.example.mall.utils.ApiUtils.error;
 import static com.example.mall.utils.ApiUtils.success;
@@ -81,12 +82,12 @@ public class ProductController {
             return error("잘못된 요청",HttpStatus.BAD_REQUEST);
         }
 
-        Product resultProduct = productService.findProduct(id);
+        Optional<Product> resultProduct = productService.findProduct(id);
 
-        if (resultProduct == null)
+        if (resultProduct.isEmpty())
             return error("존재하지 않는 상품",HttpStatus.NOT_FOUND);
 
-        return success(resultProduct);
+        return success(resultProduct.get());
     }
 
     @DeleteMapping("/products/{id}")
@@ -95,9 +96,9 @@ public class ProductController {
             return error("잘못된 요청",HttpStatus.BAD_REQUEST);
         }
         productService.deleteProduct(id);
-        Product product = productService.findProduct(id);
+        Optional<Product> product = productService.findProduct(id);
 
-        if(product == null)
+        if(product.isEmpty())
             return success("삭제 완료");
         else
             return error("서버 내부 에러",HttpStatus.INTERNAL_SERVER_ERROR);
